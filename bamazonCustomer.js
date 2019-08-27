@@ -24,7 +24,7 @@ function bamProducts() {
         console.log(chalk.bold.yellow("Welcome To Bamazon!"));
         console.log(chalk.green("\n-------------------\n"));
         for (var i = 0; i < data.length; i++) {
-            console.log(chalk.bold.cyan("Item ID: " + data[i].item_id + " | " + "Product Name: " + data[i].product_name + " | " + "Department Name: " + data[i].department_name + " | " + "Price: " + data[i].price + " | " + "Stock Quantity: " + data[i].stock_quantity));
+            console.log(chalk.underline.italic.bold.blue("Item ID:") + " " + data[i].item_id + (chalk.bold.green(" || ") + (chalk.underline.italic.bold.blue("Product Name:") + " " + data[i].product_name + (chalk.bold.green(" || ") + (chalk.underline.italic.bold.blue("Department Name:") + " " + data[i].department_name + (chalk.bold.green(" || ") + (chalk.underline.italic.bold.blue("Price:") + " " + data[i].price + (chalk.bold.green(" || ") + (chalk.underline.italic.bold.blue("Stock Quantity:") + " " + data[i].stock_quantity)))))))));
             console.log(chalk.green("\n-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n"));
         }
         buyProducts();
@@ -55,30 +55,33 @@ function totalProduct(id, stock) {
 
         if (stock <= data[0].stock_quantity) {
             let totals = data[0].price * stock;
-            console.log(chalk.cyan("Your total for " + stock + ", " + data[0].product_name + " is " + totals + ". Thank you for shopping with us!"));
+            console.log(chalk.cyan("Your total for " + stock + ", " + data[0].product_name + " is $" + totals + ". Thank you for your order!"));
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + stock + " WHERE item_id = " + id);
 
         }
         else {
-            console.log(chalk.red("Sorry, but we only have " + stock + " " + data[0].product_name + "'s left in stock."));
+            console.log(chalk.red("Sorry, but we do not have enough " + data[0].product_name + "'s left in stock to fulfill your order."));
         }
         doneOrCont();
     });
 };
+
 function doneOrCont() {
-    inquirer.prompt(
+    inquirer.prompt([
         {
-            name: "done",
-            message: "Continue Shopping?",
+            name: "continue",
+            message: "Would you like to purchase another item?",
             type: "confirm"
         }
-    ).then(function (response) {
-        if (response.continue) {
-            console.log("\n");
+    ]).then(function (response) {
+        if (response.continue == true) {
             bamProducts();
         }
 
-        else connection.end();
+        else {
+            console.log(chalk.bold.yellow("\nThank you for shopping!\n"));
+            connection.end();
+        }
     });
 
 };
